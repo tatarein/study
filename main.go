@@ -3,14 +3,26 @@ package main
 import "fmt"
 
 func main() {
-	fmt.Println("Расписание на неделю:")
+	sneakerPrice := 15000
+	fmt.Println("Система проверки баланса запущена. (Для выключения введите 0)")
 
-	// Переменная day начинается с 1; цикл работает, пока day <= 7; после каждого круга day увеличивается на 1 (day++)
-	for day := 1; day <= 7; day++ {
-		if day <= 5 {
-			fmt.Println("День", day, "- Смена + 2 часа учебы")
+	// Этот цикл будет крутиться вечно, пока мы его не остановим
+	for {
+		var budget int
+		fmt.Print("\nВведите ваш текущий бюджет: ")
+		fmt.Scan(&budget)
+
+		// Секретная кнопка выхода
+		if budget == 0 {
+			fmt.Println("Сервер остановлен. До свидания!")
+			break // Эта команда мгновенно ломает цикл
+		}
+
+		// Твоя рабочая логика проверок
+		if budget >= sneakerPrice {
+			fmt.Println("Покупка одобрена! Остаток:", budget-sneakerPrice)
 		} else {
-			fmt.Println("День", day, "- Выходной! 4 часа полного погружения в код")
+			fmt.Println("Недостаточно средств. Вам не хватает:", sneakerPrice-budget)
 		}
 	}
 }
