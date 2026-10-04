@@ -1,28 +1,31 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+	"strconv" // Этот пакет нужен, чтобы превратить текст из ссылки в математическое число
+)
+
+func checkBalance(w http.ResponseWriter, r *http.Request) {
+	// 1. Достаем значение "budget" прямо из адресной строки браузера
+	moneyFromURL := r.URL.Query().Get("budget")
+
+	// 2. Переводим текст в число (ошибку пока игнорируем с помощью _)
+	budget, _ := strconv.Atoi(moneyFromURL)
+	sneakerPrice := 15000
+
+	// 3. Наша знакомая логика, но теперь ответ улетает в браузер (используем Fprintln и букву w)
+	if budget >= sneakerPrice {
+		fmt.Fprintln(w, "Покупка одобрена! Остаток:", budget-sneakerPrice, "руб.")
+	} else {
+		fmt.Fprintln(w, "Недостаточно средств. Вам не хватает:", sneakerPrice-budget, "руб.")
+	}
+}
 
 func main() {
-	sneakerPrice := 15000
-	fmt.Println("Система проверки баланса запущена. (Для выключения введите 0)")
+	// Создаем новый маршрут: при переходе на /balance запустится функция checkBalance
+	http.HandleFunc("/balance", checkBalance)
 
-	// Этот цикл будет крутиться вечно, пока мы его не остановим
-	for {
-		var budget int
-		fmt.Print("\nВведите ваш текущий бюджет: ")
-		fmt.Scan(&budget)
-
-		// Секретная кнопка выхода
-		if budget == 0 {
-			fmt.Println("Сервер остановлен. До свидания!")
-			break // Эта команда мгновенно ломает цикл
-		}
-
-		// Твоя рабочая логика проверок
-		if budget >= sneakerPrice {
-			fmt.Println("Покупка одобрена! Остаток:", budget-sneakerPrice)
-		} else {
-			fmt.Println("Недостаточно средств. Вам не хватает:", sneakerPrice-budget)
-		}
-	}
+	fmt.Println("Сервер запущен! Проверь баланс по ссылке: http://localhost:8080/balance?budget=20000")
+	http.ListenAndServe(":8080", nil)
 }
